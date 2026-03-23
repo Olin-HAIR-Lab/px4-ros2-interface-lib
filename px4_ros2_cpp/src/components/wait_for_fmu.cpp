@@ -14,12 +14,15 @@ bool waitForFMU(
   rclcpp::Node & node, const rclcpp::Duration & timeout,
   const std::string & topic_namespace_prefix)
 {
-  RCLCPP_DEBUG(node.get_logger(), "Waiting for FMU...");
+
+  std::string topic_name_full = topic_namespace_prefix + "fmu/out/vehicle_status" +
+    px4_ros2::getMessageNameVersion<px4_msgs::msg::VehicleStatus>();
+
+
+  RCLCPP_DEBUG(node.get_logger(), "Waiting for FMU at %s", topic_name_full.c_str());
   const rclcpp::Subscription<px4_msgs::msg::VehicleStatus>::SharedPtr vehicle_status_sub =
     node.create_subscription<px4_msgs::msg::VehicleStatus>(
-    topic_namespace_prefix + "fmu/out/vehicle_status" +
-    px4_ros2::getMessageNameVersion<px4_msgs::msg::VehicleStatus>(), rclcpp::QoS(
-      1).best_effort(),
+    topic_name_full, rclcpp::QoS(1).best_effort(),
     [](px4_msgs::msg::VehicleStatus::UniquePtr msg) {});
 
   rclcpp::WaitSet wait_set;
